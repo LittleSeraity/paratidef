@@ -5,20 +5,20 @@ function resizeCanvas(){ canvas.width=window.innerWidth; canvas.height=window.in
 window.addEventListener('resize',resizeCanvas);
 resizeCanvas();
 
-// ===== FOTO Y PELOTA (CON INERCIA) =====
+// ===== FOTO Y PELOTA (MEJORADO) =====
 const img = new Image();
 img.src = '5773780779069541719.jpg'; 
 
 const ball = {
     x: canvas.width / 2,
     y: canvas.height / 2,
-    vx: 3,
-    vy: 3,
+    vx: 4,
+    vy: 4,
     radius: 60,
     isDragging: false,
     offsetX: 0,
     offsetY: 0,
-    lastX: 0, // Para calcular el impulso
+    lastX: 0,
     lastY: 0
 };
 
@@ -69,32 +69,31 @@ function updateBall() {
         ball.x += ball.vx;
         ball.y += ball.vy;
 
-        // Fricción suave (para que no ruede infinitamente a mil por hora)
-        ball.vx *= 0.98;
-        ball.vy *= 0.98;
+        // Fricción: reducimos la velocidad poco a poco (0.99 es más lento que 0.98)
+        ball.vx *= 0.99;
+        ball.vy *= 0.99;
 
-        // Rebote en bordes con corrección de posición
+        // Rebote en bordes (DERECHA e IZQUIERDA)
         if (ball.x + ball.radius > canvas.width) {
             ball.x = canvas.width - ball.radius;
-            ball.vx *= -1;
+            ball.vx = -Math.abs(ball.vx); // Forzamos dirección opuesta
         } else if (ball.x - ball.radius < 0) {
             ball.x = ball.radius;
-            ball.vx *= -1;
+            ball.vx = Math.abs(ball.vx); 
         }
 
+        // Rebote en bordes (ABAJO y ARRIBA)
         if (ball.y + ball.radius > canvas.height) {
             ball.y = canvas.height - ball.radius;
-            ball.vy *= -1;
+            ball.vy = -Math.abs(ball.vy);
         } else if (ball.y - ball.radius < 0) {
             ball.y = ball.radius;
-            ball.vy *= -1;
+            ball.vy = Math.abs(ball.vy);
         }
 
-        // Si se frena demasiado, mantener un movimiento mínimo
-        if (Math.abs(ball.vx) < 0.5 && Math.abs(ball.vy) < 0.5) {
-            ball.vx = (Math.random() - 0.5) * 4;
-            ball.vy = (Math.random() - 0.5) * 4;
-        }
+        // Velocidad mínima para que no se quede muerta en el centro
+        if (Math.abs(ball.vx) < 1.5) ball.vx = (ball.vx > 0 ? 2 : -2);
+        if (Math.abs(ball.vy) < 1.5) ball.vy = (ball.vy > 0 ? 2 : -2);
     }
 }
 
@@ -105,33 +104,41 @@ function gameLoop() {
 }
 img.onload = () => { gameLoop(); };
 
-// ===== EVENTOS DE MOUSE (LANZAMIENTO) =====
+// ===== EVENTOS DE MOUSE (LANZAMIENTO ARREGLADO) =====
 canvas.addEventListener('mousedown', e => {
-    const dx = e.clientX - ball.x;
-    const dy = e.clientY - ball.y;
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    const dx = mouseX - ball.x;
+    const dy = mouseY - ball.y;
+    
     if (Math.sqrt(dx * dx + dy * dy) < ball.radius) {
         ball.isDragging = true;
         ball.offsetX = dx;
         ball.offsetY = dy;
-        ball.lastX = e.clientX;
-        ball.lastY = e.clientY;
+        ball.lastX = mouseX;
+        ball.lastY = mouseY;
         canvas.style.cursor = 'grabbing';
     }
 });
 
 window.addEventListener('mousemove', e => {
     if (ball.isDragging) {
-        // Calculamos la velocidad actual según el movimiento del ratón
-        ball.vx = e.clientX - ball.lastX;
-        ball.vy = e.clientY - ball.lastY;
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
 
-        // Actualizamos posición
-        ball.x = e.clientX - ball.offsetX;
-        ball.y = e.clientY - ball.offsetY;
+        // Calculamos la velocidad basada en el desplazamiento actual
+        ball.vx = mouseX - ball.lastX;
+        ball.vy = mouseY - ball.lastY;
 
-        // Guardamos posición para el siguiente cálculo
-        ball.lastX = e.clientX;
-        ball.lastY = e.clientY;
+        // Actualizamos posición de la pelota
+        ball.x = mouseX - ball.offsetX;
+        ball.y = mouseY - ball.offsetY;
+
+        ball.lastX = mouseX;
+        ball.lastY = mouseY;
     }
 });
 
@@ -140,8 +147,14 @@ window.addEventListener('mouseup', () => {
         ball.isDragging = false;
         canvas.style.cursor = 'grab';
         
-        // Limitamos la velocidad máxima de lanzamiento
-        const maxSpeed = 20;
+        // Si la soltamos muy lento, le damos un empujón aleatorio
+        if (Math.abs(ball.vx) < 2 && Math.abs(ball.vy) < 2) {
+            ball.vx = (Math.random() - 0.5) * 10;
+            ball.vy = (Math.random() - 0.5) * 10;
+        }
+
+        // Limitamos velocidad máxima para que no "atraviese" paredes
+        const maxSpeed = 25;
         ball.vx = Math.max(-maxSpeed, Math.min(maxSpeed, ball.vx));
         ball.vy = Math.max(-maxSpeed, Math.min(maxSpeed, ball.vy));
     }
