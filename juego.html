@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Dancing Script', cursive; overflow: hidden; color: #330000; }
+  body { font-family: 'Dancing Script', cursive; overflow: hidden; color: #330000; background: #ffb3d6; }
 
   /* Fondo degradado animado */
   .background-gradient {
@@ -44,127 +44,15 @@
 
   /* Canvas */
   #gameCanvas { display:block; width:100%; height:100vh; cursor: grab; z-index:1; position:relative; }
+
+  /* Mensaje Diario */
+  .daily-message {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.6); padding: 10px 20px; border-radius: 20px;
+    font-size: 1.5rem; font-weight: bold; z-index: 1000;
+  }
 </style>
 </head>
 <body>
 
-<div class="background-gradient"></div>
-<div id="hearts-container"></div>
-
-<nav>
-  <ul>
-    <li><a href="index.html">Inicio</a></li>
-    <li><a href="momentos.html">Momentos</a></li>
-    <li><a href="tiempo.html">Tiempo</a></li>
-    <li><a href="juego.html">Juego</a></li>
-  </ul>
-</nav>
-
-<canvas id="gameCanvas"></canvas>
-
-<script>
-  // ===== CORAZONES =====
-  const heartsContainer = document.getElementById('hearts-container');
-  function createHeart() {
-    const heart = document.createElement('div');
-    heart.classList.add('heart');
-    heart.style.left = Math.random()*window.innerWidth+'px';
-    const size = 15+Math.random()*15;
-    heart.style.width = heart.style.height = size+'px';
-    heart.style.animationDuration = (4+Math.random()*3)+'s';
-    heartsContainer.appendChild(heart);
-    setTimeout(()=>heart.remove(),7000);
-  }
-  setInterval(createHeart,300);
-
-  // ===== CANVAS =====
-  const canvas = document.getElementById('gameCanvas');
-  const ctx = canvas.getContext('2d');
-  function resizeCanvas(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
-  window.addEventListener('resize',resizeCanvas);
-  resizeCanvas();
-
-  // ===== FOTO =====
-  const img = new Image();
-  img.src = '5773780779069541719.jpg'; // foto central del index
-  const ball = {
-    x: canvas.width/2,
-    y: canvas.height/2,
-    vx: 2,
-    vy: 3,
-    radius: 50,
-    isDragging:false,
-    offsetX:0,
-    offsetY:0
-  };
-
-  // ===== DIBUJAR =====
-  function drawBall(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
-    ctx.closePath();
-    ctx.clip();
-    ctx.drawImage(img, ball.x-ball.radius, ball.y-ball.radius, ball.radius*2, ball.radius*2);
-    ctx.restore();
-  }
-
-  // ===== ACTUALIZAR =====
-  function updateBall(){
-    if(!ball.isDragging){
-      ball.x += ball.vx;
-      ball.y += ball.vy;
-      if(ball.x + ball.radius > canvas.width){ ball.x=canvas.width-ball.radius; ball.vx*=-1; }
-      if(ball.x - ball.radius < 0){ ball.x=ball.radius; ball.vx*=-1; }
-      if(ball.y + ball.radius > canvas.height){ ball.y=canvas.height-ball.radius; ball.vy*=-1; }
-      if(ball.y - ball.radius < 0){ ball.y=ball.radius; ball.vy*=-1; }
-    }
-  }
-
-  function gameLoop(){
-    drawBall();
-    updateBall();
-    requestAnimationFrame(gameLoop);
-  }
-
-  img.onload = ()=>{ gameLoop(); }; // espera a que cargue la foto antes de empezar
-
-  // ===== MOUSE =====
-  canvas.addEventListener('mousedown', e=>{
-    const dx = e.clientX - ball.x;
-    const dy = e.clientY - ball.y;
-    if(Math.sqrt(dx*dx + dy*dy) < ball.radius){
-      ball.isDragging = true;
-      ball.offsetX = dx;
-      ball.offsetY = dy;
-      canvas.style.cursor = 'grabbing';
-    }
-  });
-  canvas.addEventListener('mousemove', e=>{
-    if(ball.isDragging){
-      ball.x = e.clientX - ball.offsetX;
-      ball.y = e.clientY - ball.offsetY;
-    }
-  });
-  canvas.addEventListener('mouseup', ()=>{
-    ball.isDragging = false;
-    canvas.style.cursor = 'grab';
-  });
-  canvas.addEventListener('mouseleave', ()=>{
-    ball.isDragging = false;
-    canvas.style.cursor = 'grab';
-  });
-  canvas.addEventListener('click', e=>{
-    if(ball.isDragging) return;
-    const dx = e.clientX - ball.x;
-    const dy = e.clientY - ball.y;
-    const force = 0.3;
-    ball.vx += dx*force/canvas.width;
-    ball.vy += dy*force/canvas.height;
-  });
-</script>
-
-</body>
-</html>
-
+<div class
