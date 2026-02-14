@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiempo Juntos - Amor / San Valentín</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="background-gradient"></div>
+<div id="hearts-container"></div>
+
+<nav>
+  <ul>
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="momentos.html">Momentos</a></li>
+    <li><a href="tiempo.html">Tiempo</a></li>
+    <li><a href="juego.html">Juego</a></li>
+  </ul>
+</nav>
+
+<main class="page tiempo-page">
+  <h1>Tiempo Juntos</h1>
+
+  <!-- Reloj centrado -->
+  <div class="clock-bg">
+    <div class="clock-face">
+      <div class="hour-mark" data-angle="0">XII</div>
+      <div class="hour-mark" data-angle="30">I</div>
+      <div class="hour-mark" data-angle="60">II</div>
+      <div class="hour-mark" data-angle="90">III</div>
+      <div class="hour-mark" data-angle="120">IV</div>
+      <div class="hour-mark" data-angle="150">V</div>
+      <div class="hour-mark" data-angle="180">VI</div>
+      <div class="hour-mark" data-angle="210">VII</div>
+      <div class="hour-mark" data-angle="240">VIII</div>
+      <div class="hour-mark" data-angle="270">IX</div>
+      <div class="hour-mark" data-angle="300">X</div>
+      <div class="hour-mark" data-angle="330">XI</div>
+
+      <div class="clock-hand" id="clockHand"></div>
+    </div>
+  </div>
+
+  <!-- Días juntos -->
+  <div class="days-count">
+    Días juntos: <span id="daysCount">0</span>
+  </div>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
